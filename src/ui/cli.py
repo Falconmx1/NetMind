@@ -1,32 +1,31 @@
-"""Interfaz de línea de comandos"""
-import click
-from src.core.capture import PacketCapture
-from src.ai.detector import AnomalyDetector
-
-@click.group()
-def cli():
-    """NetMind - Herramienta de red con IA"""
-    pass
+# Agregar al final del archivo cli.py, antes del if __name__
 
 @cli.command()
-@click.option('--interface', '-i', help='Interfaz de red')
-@click.option('--count', '-c', default=100, help='Número de paquetes a capturar')
-def capture(interface, count):
-    """Captura tráfico de red"""
-    click.echo(f"🔍 Capturando {count} paquetes...")
-    capturer = PacketCapture()
-    packets = capturer.start_capture(interface, count)
-    click.echo(f"✅ Capturados {len(packets)} paquetes")
-    return packets
+def dashboard():
+    """Inicia el dashboard web"""
+    from src.ui.dashboard import DashboardServer
+    click.echo("🌐 Iniciando dashboard web...")
+    server = DashboardServer()
+    server.start()
+    click.echo("Presiona Ctrl+C para detener")
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        click.echo("\n✅ Dashboard detenido")
 
 @cli.command()
-@click.option('--train-file', '-t', help='Archivo con tráfico normal para entrenar')
-@click.option('--detect-file', '-d', help='Archivo a analizar')
-def analyze(train_file, detect_file):
-    """Analiza tráfico con IA"""
-    click.echo("🧠 Iniciando análisis con IA...")
-    # Aquí iría la lógica de carga de archivos y análisis
-    click.echo("✅ Análisis completado")
+@click.option('--input', '-i', help='Archivo de paquetes (JSON/CSV)')
+@click.option('--format', '-f', type=click.Choice(['json', 'csv']), default='json')
+def export(input, format):
+    """Exporta análisis a JSON/CSV"""
+    # Lógica de exportación
+    click.echo(f"📁 Exportando a {format}...")
 
-if __name__ == '__main__':
-    cli()
+@cli.command()
+def gui():
+    """Inicia la interfaz gráfica"""
+    from src.ui.gui import NetMindGUI
+    click.echo("🖥️ Iniciando interfaz gráfica...")
+    app = NetMindGUI()
+    app.run()
